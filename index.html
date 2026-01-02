@@ -63,20 +63,33 @@ button:hover { transform:scale(1.05); background:#9c27b0; }
 .backgroundHeart { color:#ff1f85; font-size:100px; filter:blur(1.5px); z-index:0; opacity:0.8; text-shadow:0 0 10px rgba(255,182,193,0.3); position:absolute; }
 @keyframes floatUpForeground { 0%{transform:translateY(100vh) scale(1);} 100%{transform:translateY(-150vh) scale(1.05);} }
 @keyframes glowHeart { 0%,100% { text-shadow:0 0 8px rgba(255,192,203,0.7); } 50% { text-shadow:0 0 18px rgba(255,105,180,1); } }
-/* Final screen overlay - initially hidden */
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-10px); }
+}
 #finalContent {
-  display: flex;                  /* centers content */
-  opacity: 0;                     /* completely invisible at first */
-  pointer-events: none;           /* prevents clicks when hidden */
-  position: fixed;                /* stay on top of page */
-  inset: 0;                       /* top:0; bottom:0; left:0; right:0 */
-  z-index: 999999;                /* above everything else */
-  background: rgba(255,230,240,0.35); /* translucent pink overlay */
-  backdrop-filter: blur(18px);    /* blur background behind overlay */
-  justify-content: center;        /* center inner content horizontally */
-  align-items: center;            /* center inner content vertically */
-  padding: 20px;                  /* spacing around content */
-  transition: opacity 1.5s ease;  /* smooth fade-in/out transition */
+  display: block;                 
+  overflow-y: auto;               
+  -webkit-overflow-scrolling: touch; 
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  inset: 0;                        
+  z-index: 999999;
+  background: rgba(255,230,240,0.35); 
+  backdrop-filter: blur(18px);    
+  padding: 20px;
+  transition: opacity 1.5s ease;
+}
+#finalContent > div {
+  margin: 20px auto;           
+  max-width: 720px;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  border:1px solid rgba(255,255,255,0.3);
+  box-shadow:0 8px 32px rgba(0,0,0,0.15);
+  padding: 40px 25px;
 }
 
 /* When we want it visible */
@@ -214,11 +227,21 @@ window.addEventListener('scroll',()=>{
 function showFinalContent(){
   const finalContent = document.getElementById('finalContent');
   finalContent.classList.add('show');  // triggers fade-in
+
+  // Show scroll hint
+  const scrollHint = document.getElementById('scrollHint');
+  scrollHint.style.opacity = 1;
+
+  // Hide hint when user scrolls the overlay
+  finalContent.addEventListener('scroll', () => {
+    scrollHint.style.opacity = 0;
+  }, { once: true }); // only hide once when they scroll
 }
 
-function closeFinalContent(){
+function closeFinalContent() {
   const finalContent = document.getElementById('finalContent');
-  finalContent.classList.remove('show'); // triggers fade-out
+  finalContent.classList.remove('show');   // fade-out overlay
+  document.body.style.overflow = 'auto';   // unlock background scroll
 }
 
 
@@ -276,9 +299,23 @@ Aur Meri Zindagi Ko Zindagi Banane Ke Liye
     </button>
 
   </div>
+  <!-- Scroll hint -->
+<div id="scrollHint" style="
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  color: #ff1f85;
+  animation: bounce 1.5s infinite;
+  pointer-events: none;
+  opacity: 0; /* initially hidden */
+  transition: opacity 0.5s ease;
+">⬇️</div>
 </div>
 </body>
 </html>
+
 
 
 
